@@ -1,10 +1,13 @@
 package com.kamillo.task.scheduler.infrastructure.order;
 
 import com.kamillo.task.scheduler.domain.OrderDomain;
+import com.kamillo.task.scheduler.domain.SeatsDomain;
 import com.kamillo.task.scheduler.domain.order.OrderRepository;
 import com.kamillo.task.scheduler.domain.saga.SagaSeatEnum;
+import com.kamillo.task.scheduler.infrastructure.api.BlockSeatParams;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -25,13 +28,15 @@ public class PostgresOrderRepository implements OrderRepository {
     }
 
     @Override
+    @Transactional
     public OrderDomain updateOrderState(UUID orderId, SagaSeatEnum state) {
-        PostgresOrder postgresOrder = orderRepo.getByOrderID(orderId).orElseThrow(NoSuchOrderException::new);
+        PostgresOrder postgresOrder = orderRepo.getByOrderID(orderId).orElseThrow(() -> new NoSuchOrderException(orderId));
         postgresOrder.setOrderState(state);
         return orderMapper.toOrderDomain(orderRepo.save(postgresOrder));
     }
 
     @Override
+    @Transactional
     public void saveOrUpdateOrderState(UUID orderId, SagaSeatEnum state) {
         Optional<PostgresOrder> optionalOrder = orderRepo.getByOrderID(orderId);
         optionalOrder.ifPresentOrElse(postgresOrder -> {
@@ -42,9 +47,9 @@ public class PostgresOrderRepository implements OrderRepository {
         );
     }
 
-    private OrderDomain saveOrder(OrderDomain domain) {
+    public void saveOrder(OrderDomain domain) {
         PostgresOrder saved = orderRepo.save(orderMapper.toOrder(domain));
-        return orderMapper.toOrderDomain(saved);
+        orderMapper.toOrderDomain(saved);
     }
 
 }

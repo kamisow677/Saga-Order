@@ -18,12 +18,12 @@ import java.util.UUID;
 import static com.kamillo.task.scheduler.infrastructure.saga.MessagesFactory.ORDER_ID_HEADER;
 
 @Component
-public class StateMachineFactory {
+public class MyStateMachineFactory {
 
     private final org.springframework.statemachine.config.StateMachineFactory<SagaSeatEnum, SagaSeatEvents> stateMachineFactory;
     private final PostgresOrderRepository postgresOrderRepository;
 
-    public StateMachineFactory(org.springframework.statemachine.config.StateMachineFactory<SagaSeatEnum, SagaSeatEvents> stateMachineFactory, PostgresOrderRepository postgresOrderRepository) {
+    public MyStateMachineFactory(org.springframework.statemachine.config.StateMachineFactory<SagaSeatEnum, SagaSeatEvents> stateMachineFactory, PostgresOrderRepository postgresOrderRepository) {
         this.stateMachineFactory = stateMachineFactory;
         this.postgresOrderRepository = postgresOrderRepository;
     }

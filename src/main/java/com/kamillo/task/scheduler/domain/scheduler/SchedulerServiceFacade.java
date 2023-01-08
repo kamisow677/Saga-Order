@@ -1,39 +1,71 @@
 package com.kamillo.task.scheduler.domain.scheduler;
 
-import com.kamillo.task.scheduler.infrastructure.scheduler.HelloJob;
-import com.kamillo.task.scheduler.infrastructure.scheduler.JobsData;
-import com.kamillo.task.scheduler.infrastructure.scheduler.TriggersData;
+import org.quartz.JobDataMap;
+import org.quartz.SchedulerException;
+import org.quartz.TriggerKey;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.quartz.CronTriggerFactoryBean;
+import org.springframework.scheduling.quartz.JobDetailFactoryBean;
+import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import java.util.Optional;
 
 @Service
 public class SchedulerServiceFacade {
 
-    private final SchedulerService quartzSchedulerService;
+    @Autowired
+    SchedulerJobFactory schedulerJobFactory;
+    @Autowired
+    SchedulerTriggerFactory schedulerTriggerFactory;
+    @Autowired
+    private SchedulerFactoryBean schedulerFactoryBean;
 
-    public SchedulerServiceFacade(SchedulerService quartzSchedulerService) {
-        this.quartzSchedulerService = quartzSchedulerService;
+    public TriggerKey schedulePaymentFinishedJob() {
+        // define the job and tie it to our PaymentFinishedJob class
+        JobDataMap data = new JobDataMap();
+
+        JobDetailFactoryBean jdfb = schedulerJobFactory.job(PaymentFinishedJob.class, data, PaymentFinishedJob.class.getName());
+        CronTriggerFactoryBean stfb =
+                schedulerTriggerFactory.jobTrigger(jdfb.getObject(),
+                        "0/5 * * * * ?",
+                        "CronTriggerFactoryBean");
+
+        // Tell quartz to schedule the job using our trigger
+        try {
+            schedulerFactoryBean.getScheduler()
+                    .scheduleJob(jdfb.getObject(), stfb.getObject());
+        } catch (SchedulerException e) {
+            e.printStackTrace();
+        }
+        return stfb.getObject().getKey();
     }
 
-    public boolean schedule() {
-        int totalCount = 5;
-        JobsData jobsData = new JobsData("Job name", totalCount);
-        TriggersData triggersData = new TriggersData(3, totalCount - 1, false);
-        return quartzSchedulerService.schedule(HelloJob.class, jobsData, triggersData);
+    public boolean unschedulePaymentFinishedJob(TriggerKey triggerKey) {
+        // Tell quartz to schedule the job using our trigger
+        try {
+            schedulerFactoryBean.getScheduler()
+                    .unscheduleJob(triggerKey);
+        } catch (SchedulerException e) {
+            e.printStackTrace();
+        }
+        return true;
     }
 
-    public List<JobsData> getAllJobData() {
-        return quartzSchedulerService.getJobData();
+
+    public Optional<String> getRunningJob(String jobClassName) {
+        return Optional.of("");
     }
 
-    public Optional<JobsData> getRunningJob(String jobClassName) {
-        return quartzSchedulerService.getRunningJob(jobClassName);
+    @PostConstruct
+    public void setup() {
     }
 
-    public boolean deleteTimer(String timerId) {
-        return quartzSchedulerService.deleteTimer(timerId);
+    @PreDestroy
+    public void clean() {
     }
+
 
 }
