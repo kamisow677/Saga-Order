@@ -11,7 +11,10 @@ import org.springframework.stereotype.Component;
 
 import java.util.UUID;
 
-import static com.kamillo.task.scheduler.domain.saga.SagaSeatEvents.*;
+import static com.kamillo.task.scheduler.domain.saga.SagaSeatEvents.BLOCK_EVENT;
+import static com.kamillo.task.scheduler.domain.saga.SagaSeatEvents.PAYMENT_DONE_EVENT;
+import static com.kamillo.task.scheduler.domain.saga.SagaSeatEvents.PAYMENT_REJECTED_EVENT;
+import static com.kamillo.task.scheduler.domain.saga.SagaSeatEvents.START_PAYMENT_EVENT;
 
 @Component
 public class SeatSagaFacade {

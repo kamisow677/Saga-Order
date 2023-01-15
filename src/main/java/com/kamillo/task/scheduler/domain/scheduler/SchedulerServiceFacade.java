@@ -1,5 +1,7 @@
 package com.kamillo.task.scheduler.domain.scheduler;
 
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
 import org.quartz.JobDataMap;
 import org.quartz.SchedulerException;
 import org.quartz.TriggerKey;
@@ -9,8 +11,6 @@ import org.springframework.scheduling.quartz.JobDetailFactoryBean;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 import java.util.Optional;
 
 @Service

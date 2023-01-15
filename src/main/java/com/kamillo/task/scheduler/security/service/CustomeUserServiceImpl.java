@@ -5,6 +5,7 @@ import com.kamillo.task.scheduler.security.users.CustomeUser;
 import com.kamillo.task.scheduler.domain.CustomeUserService;
 import com.kamillo.task.scheduler.security.users.repo.CustomeRoleRepo;
 import com.kamillo.task.scheduler.security.users.repo.CustomeUserRepo;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Sort;
@@ -16,7 +17,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;

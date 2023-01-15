@@ -4,20 +4,24 @@ import com.kamillo.task.scheduler.domain.saga.SagaSeatEnum;
 import com.kamillo.task.scheduler.infrastructure.api.BlockSeatParams;
 import com.kamillo.task.scheduler.infrastructure.order.GeneratedOrderRepo;
 import com.kamillo.task.scheduler.infrastructure.order.PostgresOrder;
+import com.kamillo.task.scheduler.infrastructure.seats.GeneratedSeatsRepo;
+import com.kamillo.task.scheduler.infrastructure.seats.Seats;
 import com.kamillo.task.scheduler.infrastructure.task.GeneratedTaskRepo;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Duration;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
 
 
 public class EmployeeRestControllerIT extends BaseIT {
@@ -27,6 +31,9 @@ public class EmployeeRestControllerIT extends BaseIT {
 
     @Autowired
     private GeneratedTaskRepo taskRepo;
+
+    @Autowired
+    private GeneratedSeatsRepo seatsRepo;
 
     @AfterEach
     public void clean() {
@@ -90,9 +97,44 @@ public class EmployeeRestControllerIT extends BaseIT {
         assertEquals(response.getStatusCode(), HttpStatus.OK);
     }
 
+    @Test
+    public void shouldRejectPaymentAndFreeSeet() {
+        // given
+        UUID orderId = UUID.randomUUID();
+        //seat is free now one blocked it
+        Seats seats = seatsRepo.findAll().get(0);
+        seats.setFree(false);
+        PostgresOrder order = PostgresOrder.builder().orderId(orderId).orderState(SagaSeatEnum.SEAT_PAYMENT_PENDING).build();
+        order.setSeats(seats);
+        orderRepo.save(order);
+
+        // when
+        // trying to start payment on unblocked seat
+        ResponseEntity<String> response = rejectPayment(orderId);
+
+        //then
+        await()
+            .atLeast(Duration.ZERO)
+            .atMost(Duration.ofSeconds(20))
+            .with()
+            .pollInterval(Duration.ofSeconds(2))
+            .untilAsserted(() -> {
+                PostgresOrder orderChanged = orderRepo.findById(order.getId())
+                        .orElseThrow(() -> new AssertionError("Test is corrupted"));
+                Seats seatsChanged = seatsRepo.findById(seats.getId())
+                        .orElseThrow(() -> new AssertionError("Test is corrupted"));
+                assertEquals(SagaSeatEnum.SEAT_FREE, orderChanged.getOrderState());
+                assertTrue(seatsChanged.isFree());
+                assertEquals(response.getStatusCode(), HttpStatus.OK);
+            });
+    }
+
     private ResponseEntity<String> startPaymentRequest(UUID orderId) {
         return post("/public/start_payment",  String.class, Map.of(ORDER_ID_PARAM , orderId.toString()), null);
     }
 
+    private ResponseEntity<String> rejectPayment(UUID orderId) {
+        return post("/public/rejected_payment",  String.class, Map.of(ORDER_ID_PARAM , orderId.toString()), null);
+    }
 
 }

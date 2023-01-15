@@ -1,13 +1,11 @@
 package com.kamillo.task.scheduler.infrastructure.order;
 
 import com.kamillo.task.scheduler.domain.OrderDomain;
-import com.kamillo.task.scheduler.domain.SeatsDomain;
 import com.kamillo.task.scheduler.domain.order.OrderRepository;
 import com.kamillo.task.scheduler.domain.saga.SagaSeatEnum;
-import com.kamillo.task.scheduler.infrastructure.api.BlockSeatParams;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
-import javax.transaction.Transactional;
 import java.util.Optional;
 import java.util.UUID;
 

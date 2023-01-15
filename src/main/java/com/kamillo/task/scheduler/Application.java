@@ -1,28 +1,16 @@
 package com.kamillo.task.scheduler;
 
-import com.kamillo.task.scheduler.domain.CustomeUserService;
-import com.kamillo.task.scheduler.security.users.CustomeRole;
-import com.kamillo.task.scheduler.security.users.CustomeUser;
-import com.kamillo.task.scheduler.security.users.repo.CustomeUserRepo;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.CustomAutowireConfigurer;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
-import org.springframework.context.annotation.Bean;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.test.context.ActiveProfiles;
-
-import java.util.HashSet;
 
 @SpringBootApplication
 @ActiveProfiles("local")
 public class Application {
 
-	public static void main(String[] args) {
-		SpringApplication.run(Application.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(Application.class, args);
+    }
 
 
 //	@Bean

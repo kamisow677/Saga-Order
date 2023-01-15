@@ -8,10 +8,13 @@ import com.kamillo.task.scheduler.infrastructure.order.GeneratedOrderRepo;
 import com.kamillo.task.scheduler.infrastructure.order.OrderMapper;
 import com.kamillo.task.scheduler.infrastructure.order.PostgresOrder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
-import javax.transaction.Transactional;
 import java.util.NoSuchElementException;
 import java.util.UUID;
+
+import static org.junit.Assert.assertTrue;
 
 @Service
 public class PostgresSeatsRepository implements SeatsRepository {
@@ -45,7 +48,9 @@ public class PostgresSeatsRepository implements SeatsRepository {
     }
 
     @Override
+    @Transactional
     public void freeSeats(UUID orderId) {
+        assertTrue(TransactionSynchronizationManager.isActualTransactionActive());
         seatsRepo.freeSeat(orderId);
     }
 

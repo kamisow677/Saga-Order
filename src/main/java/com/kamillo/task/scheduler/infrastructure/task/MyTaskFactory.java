@@ -6,11 +6,12 @@ import com.kamillo.task.scheduler.domain.scheduler.TaskFactory;
 import com.kamillo.task.scheduler.infrastructure.order.GeneratedOrderRepo;
 import com.kamillo.task.scheduler.infrastructure.order.NoSuchOrderException;
 import com.kamillo.task.scheduler.infrastructure.order.PostgresOrder;
+import jakarta.annotation.PreDestroy;
+import jakarta.transaction.Transactional;
 import org.quartz.TriggerKey;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PreDestroy;
-import javax.transaction.Transactional;
+
 import java.time.OffsetTime;
 import java.util.UUID;
 
