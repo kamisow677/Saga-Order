@@ -14,4 +14,6 @@ public interface OrderRepository {
     OrderDomain updateOrderState(UUID orderId, SagaSeatEnum state);
 
     void saveOrUpdateOrderState(UUID orderId, SagaSeatEnum state);
+
+    void saveOrder(OrderDomain domain);
 }

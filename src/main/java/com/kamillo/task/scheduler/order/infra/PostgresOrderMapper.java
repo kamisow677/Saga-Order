@@ -1,10 +1,10 @@
-package com.kamillo.task.scheduler.infrastructure.order;
+package com.kamillo.task.scheduler.order.infra;
 
-import com.kamillo.task.scheduler.domain.OrderDomain;
+import com.kamillo.task.scheduler.order.domain.OrderDomain;
 import org.springframework.stereotype.Component;
 
 @Component
-public class OrderMapper {
+class OrderMapper {
 
     public PostgresOrder toOrder(OrderDomain domain) {
         return PostgresOrder.builder()

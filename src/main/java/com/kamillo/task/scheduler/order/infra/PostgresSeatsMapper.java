@@ -4,10 +4,10 @@ import com.kamillo.task.scheduler.domain.SeatsDomain;
 import org.springframework.stereotype.Component;
 
 @Component
-public class SeatsMapper {
+public class PostgresSeatsMapper {
 
-    public Seats toSeats(SeatsDomain domain) {
-        return Seats.builder()
+    public PostgresSeats toSeats(SeatsDomain domain) {
+        return PostgresSeats.builder()
                 .id(domain.getId())
                 .row(domain.getRow())
                 .number(domain.getRow())
@@ -15,12 +15,12 @@ public class SeatsMapper {
                 .build();
     }
 
-    public SeatsDomain toSeatsDomain(Seats seats) {
+    public SeatsDomain toSeatsDomain(PostgresSeats postgresSeats) {
         return SeatsDomain.builder()
-                .id(seats.getId())
-                .row(seats.getRow())
-                .number(seats.getRow())
-                .free(seats.isFree())
+                .id(postgresSeats.getId())
+                .row(postgresSeats.getRow())
+                .number(postgresSeats.getRow())
+                .free(postgresSeats.isFree())
                 .build();
     }
 

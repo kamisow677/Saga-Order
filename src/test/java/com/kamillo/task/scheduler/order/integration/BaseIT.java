@@ -1,7 +1,7 @@
 package com.kamillo.task.scheduler.integration;
 
 import com.kamillo.task.scheduler.infrastructure.seats.GeneratedSeatsRepo;
-import com.kamillo.task.scheduler.infrastructure.seats.Seats;
+import com.kamillo.task.scheduler.infrastructure.seats.PostgresSeats;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,7 +40,7 @@ public class BaseIT <T> {
     public void setup() {
         IntStream.range(1, 3).forEach(
             row -> IntStream.range(1, 3).forEach(
-                number -> seatsRepo.save(Seats.builder().row(row).number(number).free(true).build())
+                number -> seatsRepo.save(PostgresSeats.builder().row(row).number(number).free(true).build())
             )
         );
     }

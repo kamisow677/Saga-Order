@@ -1,8 +1,8 @@
-package com.kamillo.task.scheduler.integration;
+package com.kamillo.task.scheduler.order.integration;
 
 import com.kamillo.task.scheduler.domain.saga.SagaSeatEnum;
-import com.kamillo.task.scheduler.infrastructure.order.GeneratedOrderRepo;
-import com.kamillo.task.scheduler.infrastructure.order.PostgresOrder;
+import com.kamillo.task.scheduler.order.infra.GeneratedOrderRepo;
+import com.kamillo.task.scheduler.order.infra.PostgresOrder;
 import com.kamillo.task.scheduler.infrastructure.task.GeneratedTaskRepo;
 import com.kamillo.task.scheduler.infrastructure.task.Task;
 import com.kamillo.task.scheduler.infrastructure.task.TaskStatus;
@@ -61,7 +61,7 @@ public class SchedulerIT extends BaseIT {
 
         // when
         post("/public/start_payment",  String.class, Map.of(ORDER_ID_PARAM, orderId.toString()), null);
-        sleep(10);
+        sleep(2);
         post("/public/accepted_payment",  String.class, Map.of(ORDER_ID_PARAM, orderId.toString()), null);
 
         // then
