@@ -1,16 +1,13 @@
-package com.kamillo.task.scheduler.infrastructure.seats;
+package com.kamillo.task.scheduler.order.infra;
 
-import com.kamillo.task.scheduler.domain.SeatsDomain;
-import com.kamillo.task.scheduler.domain.seats.SeatsRepository;
+import com.kamillo.task.scheduler.order.domain.SeatsRepository;
 import com.kamillo.task.scheduler.infrastructure.api.BlockSeatParams;
-import com.kamillo.task.scheduler.order.infra.GeneratedOrderRepo;
-import com.kamillo.task.scheduler.order.infra.PostgresOrder;
+import jakarta.persistence.LockModeType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.util.NoSuchElementException;
-import java.util.Optional;
 import java.util.UUID;
 
 import static org.junit.Assert.assertTrue;
@@ -30,19 +27,25 @@ public class PostgresSeatsRepository implements SeatsRepository {
 
     @Override
     public boolean areFree(BlockSeatParams blockSeatParams) {
-        return seatsRepo.findByNumberIdAndRow(blockSeatParams.numberId(), blockSeatParams.rowId())
+        return seatsRepo.findByNumberIdAndRow(blockSeatParams.numberId(), blockSeatParams.rowId(), LockModeType.PESSIMISTIC_READ)
                 .orElseThrow(NoSuchElementException::new)
                 .isFree();
     }
 
     @Override
     @Transactional
-    public boolean freeSeats(UUID orderId) {
+    public boolean setFree(UUID orderId) {
         assertTrue(TransactionSynchronizationManager.isActualTransactionActive());
         seatsRepo.freeSeat(orderId);
         PostgresSeats byOrderOrderId = seatsRepo.findByOrderOrderId(orderId).orElseThrow(NoSuchElementException::new);
         byOrderOrderId.setFree(true);
         return true;
+    }
+
+    @Override
+    public boolean exists(BlockSeatParams blockSeatParams) {
+        return seatsRepo.findByNumberIdAndRow(blockSeatParams.numberId(), blockSeatParams.rowId())
+                .isPresent();
     }
 
 }

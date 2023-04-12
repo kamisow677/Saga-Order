@@ -1,12 +1,12 @@
 package com.kamillo.task.scheduler.infrastructure.task;
 
-import com.kamillo.task.scheduler.infrastructure.order.PostgresOrder;
+import com.kamillo.task.scheduler.order.infra.PostgresOrder;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
 import jakarta.persistence.*;
-import javax.validation.constraints.Max;
+
 import java.time.OffsetTime;
 
 @Entity

@@ -1,5 +1,6 @@
-package com.kamillo.task.scheduler.infrastructure.seats;
+package com.kamillo.task.scheduler.order.infra;
 
+import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -8,6 +9,9 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface GeneratedSeatsRepo extends JpaRepository<PostgresSeats, Long> {
+
+    @Query("SELECT s FROM PostgresSeats s WHERE s.row = ?1 AND s.number = ?2")
+    Optional<PostgresSeats> findByNumberIdAndRow(long numberId, long rowId, LockModeType lockModeType);
 
     @Query("SELECT s FROM PostgresSeats s WHERE s.row = ?1 AND s.number = ?2")
     Optional<PostgresSeats> findByNumberIdAndRow(long numberId, long rowId);

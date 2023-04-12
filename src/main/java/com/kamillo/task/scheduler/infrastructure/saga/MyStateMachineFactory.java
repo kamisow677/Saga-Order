@@ -1,9 +1,9 @@
 package com.kamillo.task.scheduler.infrastructure.saga;
 
-import com.kamillo.task.scheduler.domain.OrderDomain;
+import com.kamillo.task.scheduler.order.domain.OrderDomain;
 import com.kamillo.task.scheduler.domain.saga.SagaSeatEnum;
 import com.kamillo.task.scheduler.domain.saga.SagaSeatEvents;
-import com.kamillo.task.scheduler.infrastructure.order.PostgresOrderRepository;
+import com.kamillo.task.scheduler.order.domain.OrderRepository;
 import org.springframework.messaging.Message;
 import org.springframework.statemachine.StateMachine;
 import org.springframework.statemachine.state.State;
@@ -21,11 +21,11 @@ import static com.kamillo.task.scheduler.infrastructure.saga.MessagesFactory.ORD
 public class MyStateMachineFactory {
 
     private final org.springframework.statemachine.config.StateMachineFactory<SagaSeatEnum, SagaSeatEvents> stateMachineFactory;
-    private final PostgresOrderRepository postgresOrderRepository;
+    private final OrderRepository postgresOrderRepository;
 
-    public MyStateMachineFactory(org.springframework.statemachine.config.StateMachineFactory<SagaSeatEnum, SagaSeatEvents> stateMachineFactory, PostgresOrderRepository postgresOrderRepository) {
+    public MyStateMachineFactory(org.springframework.statemachine.config.StateMachineFactory<SagaSeatEnum, SagaSeatEvents> stateMachineFactory, OrderRepository orderRepository) {
         this.stateMachineFactory = stateMachineFactory;
-        this.postgresOrderRepository = postgresOrderRepository;
+        this.postgresOrderRepository = orderRepository;
     }
 
     public StateMachine<SagaSeatEnum, SagaSeatEvents> build(OrderDomain order) {

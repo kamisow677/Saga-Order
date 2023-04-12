@@ -1,4 +1,4 @@
-package com.kamillo.task.scheduler.infrastructure.seats;
+package com.kamillo.task.scheduler.order.infra;
 
 import com.kamillo.task.scheduler.domain.SeatsDomain;
 import org.springframework.stereotype.Component;

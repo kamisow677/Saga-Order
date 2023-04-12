@@ -2,7 +2,6 @@ package com.kamillo.task.scheduler.domain.saga;
 
 import com.kamillo.task.scheduler.order.domain.OrderDomain;
 import com.kamillo.task.scheduler.order.domain.OrderFactory;
-import com.kamillo.task.scheduler.domain.seats.SeatFacade;
 import com.kamillo.task.scheduler.infrastructure.api.BlockSeatParams;
 import com.kamillo.task.scheduler.infrastructure.saga.MyStateMachineFactory;
 import org.springframework.statemachine.StateMachine;
@@ -18,21 +17,17 @@ import static com.kamillo.task.scheduler.domain.saga.SagaSeatEvents.START_PAYMEN
 @Component
 public class SeatSagaFacade {
 
-    private final SeatFacade seatFacade;
     private final OrderFactory orderFactory;
     private final MessagesSender<SagaSeatEvents> messagesSender;
     private final MyStateMachineFactory myStateMachineFactory;
 
-    public SeatSagaFacade(SeatFacade seatFacade, OrderFactory orderFactory, MessagesSender<SagaSeatEvents> messagesSender, MyStateMachineFactory myStateMachineFactory) {
-        this.seatFacade = seatFacade;
+    public SeatSagaFacade(OrderFactory orderFactory, MessagesSender<SagaSeatEvents> messagesSender, MyStateMachineFactory myStateMachineFactory) {
         this.orderFactory = orderFactory;
         this.messagesSender = messagesSender;
         this.myStateMachineFactory = myStateMachineFactory;
     }
 
     public UUID blockSeat(BlockSeatParams params) {
-        if (!seatFacade.checkIfSeatIsFree(params))
-            throw new SeatIsNotFreeException();
         OrderDomain order = new OrderDomain(UUID.randomUUID());
         StateMachine<SagaSeatEnum, SagaSeatEvents> stateMachine = myStateMachineFactory.build(order);
         stateMachine.sendEvent(messagesSender.create(BLOCK_EVENT, order, params));

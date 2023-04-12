@@ -1,6 +1,5 @@
-package com.kamillo.task.scheduler.domain.order;
+package com.kamillo.task.scheduler.order.domain;
 
-import com.kamillo.task.scheduler.domain.OrderDomain;
 import com.kamillo.task.scheduler.domain.saga.SagaSeatEnum;
 import com.kamillo.task.scheduler.infrastructure.api.BlockSeatParams;
 
@@ -15,5 +14,9 @@ public interface OrderRepository {
 
     void saveOrUpdateOrderState(UUID orderId, SagaSeatEnum state);
 
-    void saveOrder(OrderDomain domain);
+    OrderDomain saveOrder(OrderDomain domain);
+
+    OrderDomain createOrderWithBlockedSeats(OrderDomain domain, BlockSeatParams blockSeatParams);
+
+    boolean decoupleSeats(UUID orderId);
 }

@@ -1,8 +1,8 @@
-package com.kamillo.task.scheduler.integration;
+package com.kamillo.task.scheduler.order.integration;
 
-import com.kamillo.task.scheduler.infrastructure.seats.GeneratedSeatsRepo;
-import com.kamillo.task.scheduler.infrastructure.seats.PostgresSeats;
-import org.junit.jupiter.api.BeforeAll;
+import com.kamillo.task.scheduler.order.infra.GeneratedSeatsRepo;
+import com.kamillo.task.scheduler.order.infra.PostgresSeats;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -36,7 +36,7 @@ public class BaseIT <T> {
     @Autowired
     private TestRestTemplate restTemplate;
 
-    @BeforeAll
+    @BeforeEach
     public void setup() {
         IntStream.range(1, 3).forEach(
             row -> IntStream.range(1, 3).forEach(

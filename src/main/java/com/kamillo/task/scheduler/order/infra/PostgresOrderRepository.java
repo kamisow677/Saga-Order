@@ -1,53 +1,79 @@
-package com.kamillo.task.scheduler.infrastructure.order;
+package com.kamillo.task.scheduler.order.infra;
 
-import com.kamillo.task.scheduler.domain.OrderDomain;
-import com.kamillo.task.scheduler.domain.order.OrderRepository;
 import com.kamillo.task.scheduler.domain.saga.SagaSeatEnum;
-import jakarta.transaction.Transactional;
-import org.springframework.stereotype.Service;
+import com.kamillo.task.scheduler.infrastructure.api.BlockSeatParams;
+import com.kamillo.task.scheduler.order.domain.OrderDomain;
+import com.kamillo.task.scheduler.order.domain.OrderRepository;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 
-@Service
-public class PostgresOrderRepository implements OrderRepository {
 
-    private final OrderMapper orderMapper;
+@Component
+class PostgresOrderRepository implements OrderRepository {
+
+    private final PostgresOrderMapper postgresOrderMapper;
     private final GeneratedOrderRepo orderRepo;
+    private final GeneratedSeatsRepo seatsRepo;
 
-    public PostgresOrderRepository(OrderMapper orderMapper, GeneratedOrderRepo orderRepo) {
-        this.orderMapper = orderMapper;
+    public PostgresOrderRepository(PostgresOrderMapper postgresOrderMapper, GeneratedOrderRepo orderRepo, GeneratedSeatsRepo seatsRepo) {
+        this.postgresOrderMapper = postgresOrderMapper;
         this.orderRepo = orderRepo;
+        this.seatsRepo = seatsRepo;
     }
 
     @Override
     public Optional<OrderDomain> getOrder(UUID orderId) {
-        return orderRepo.getByOrderID(orderId).map(orderMapper::toOrderDomain);
+        return orderRepo.getByOrderID(orderId).map(postgresOrderMapper::toDomain);
     }
 
     @Override
-    @Transactional
     public OrderDomain updateOrderState(UUID orderId, SagaSeatEnum state) {
         PostgresOrder postgresOrder = orderRepo.getByOrderID(orderId).orElseThrow(() -> new NoSuchOrderException(orderId));
         postgresOrder.setOrderState(state);
-        return orderMapper.toOrderDomain(orderRepo.save(postgresOrder));
+        return postgresOrderMapper.toDomain(orderRepo.save(postgresOrder));
+    }
+
+    @Override
+    @Transactional(isolation = Isolation.READ_COMMITTED)
+    public void saveOrUpdateOrderState(UUID orderId, SagaSeatEnum state) {
+        Optional<PostgresOrder> optionalOrder = orderRepo.getByOrderID(orderId);
+        optionalOrder.ifPresentOrElse(
+                postgresOrder -> postgresOrder.setOrderState(state),
+                () -> orderRepo.save(PostgresOrder.builder().orderId(orderId).orderState(state).build())
+        );
+    }
+
+    @Override
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    public OrderDomain createOrderWithBlockedSeats(OrderDomain domain, BlockSeatParams blockSeatParams) {
+        PostgresSeats byNumberIdAndRow = seatsRepo.findByNumberIdAndRow(blockSeatParams.numberId(), blockSeatParams.rowId())
+                .orElseThrow(NoSuchElementException::new);
+        if (!byNumberIdAndRow.isFree()) {
+            throw new SeatIsNotFreeException();
+        }
+        byNumberIdAndRow.setFree(false);
+        PostgresOrder postgresOrder = postgresOrderMapper.toEntity(domain);
+        postgresOrder.setSeats(byNumberIdAndRow);
+        orderRepo.save(postgresOrder);
+        return postgresOrderMapper.toDomain(postgresOrder);
+    }
+
+    public OrderDomain saveOrder(OrderDomain domain) {
+        PostgresOrder saved = orderRepo.save(postgresOrderMapper.toEntity(domain));
+        return postgresOrderMapper.toDomain(saved);
     }
 
     @Override
     @Transactional
-    public void saveOrUpdateOrderState(UUID orderId, SagaSeatEnum state) {
-        Optional<PostgresOrder> optionalOrder = orderRepo.getByOrderID(orderId);
-        optionalOrder.ifPresentOrElse(postgresOrder -> {
-                    postgresOrder.setOrderState(state);
-                    orderMapper.toOrderDomain(orderRepo.save(postgresOrder));
-                },
-                () -> saveOrder(new OrderDomain(orderId, state))
-        );
-    }
-
-    public void saveOrder(OrderDomain domain) {
-        PostgresOrder saved = orderRepo.save(orderMapper.toOrder(domain));
-        orderMapper.toOrderDomain(saved);
+    public boolean decoupleSeats(UUID orderId) {
+        PostgresOrder order = orderRepo.findByOrderId(orderId).orElseThrow(NoSuchElementException::new);
+        order.deleteSeats();
+        return true;
     }
 
 }

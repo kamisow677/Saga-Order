@@ -4,36 +4,11 @@ spring:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
       ddl-auto: create
-#    properties:
-#      hibernate:
-#        default_schema: saga
-#  datasource:
-#    url: jdbc:postgresql://localhost:5433/postgres?saga
     hikari:
       schema: task
     driverClassName: org.postgresql.Driver
     username: postgres
     password: password
 
-##--kafka
-#  cloud:
-#    stream:
-#      function:
-#        definition: fizzBuzzProducer;fizzBuzzProcessor;fizzBuzzConsumer
-#      bindings:
-#        input:
-#          destination: numbers2
-#        output:
-#          destination: numbers2
-#        fizzBuzzProducer-out-0:
-#          destination: numbers
-#        fizzBuzzProcessor-in-0:
-#          destination: numbers
-#        fizzBuzzProcessor-out-0:
-#          destination: fizz-buzz
-#        fizzBuzzConsumer-in-0:
-#          destination: fizz-buzz
-#      kafka:
-#        binder:
-#          brokers: localhost:9092
-#          auto-create-topics: true
+PaymentFinishedJobProperties:
+  timeToFinish: 5

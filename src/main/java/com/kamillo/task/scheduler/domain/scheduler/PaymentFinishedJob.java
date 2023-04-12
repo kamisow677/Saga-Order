@@ -16,11 +16,12 @@ import java.util.List;
 @Component
 public class PaymentFinishedJob extends QuartzJobBean {
 
-    private static final long TIME_TO_FINISH = 20;
+    private final PaymentFinishedJobProperties properties;
 
     private GeneratedTaskRepo generatedTaskRepo;
 
-    public PaymentFinishedJob(GeneratedTaskRepo generatedTaskRepo) {
+    public PaymentFinishedJob(PaymentFinishedJobProperties properties, GeneratedTaskRepo generatedTaskRepo) {
+        this.properties = properties;
         this.generatedTaskRepo = generatedTaskRepo;
     }
 
@@ -32,12 +33,12 @@ public class PaymentFinishedJob extends QuartzJobBean {
         for (Task task : allByType) {
             switch (task.getOrder().getOrderState()) {
                 case SEAT_PAYMENT_PENDING -> {
-                    if (task.getCreatedAt().plusSeconds(TIME_TO_FINISH).isBefore(OffsetTime.now())) {
+                    if (task.getCreatedAt().plusSeconds(properties.timeToFinish).isBefore(OffsetTime.now())) {
                         System.out.println("TaskId: " + task.getId() + " payment pending failed for order: " + task.getOrder().getOrderId());
                         task.setStatus(TaskStatus.FAILED);
                     } else {
                         System.out.println("TaskId: " + task.getId() + " in status: " + task.getOrder().getOrderState() + " has " +
-                                ChronoUnit.SECONDS.between(OffsetTime.now(), task.getCreatedAt().plusSeconds(TIME_TO_FINISH)) +" seconds to finish");
+                                ChronoUnit.SECONDS.between(OffsetTime.now(), task.getCreatedAt().plusSeconds(properties.timeToFinish)) +" seconds to finish");
                     }
                     generatedTaskRepo.save(task);
                 }

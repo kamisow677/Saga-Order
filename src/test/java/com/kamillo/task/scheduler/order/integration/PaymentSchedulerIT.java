@@ -19,7 +19,7 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
 
-public class SchedulerIT extends BaseIT {
+public class PaymentSchedulerIT extends BaseIT {
 
     @Autowired
     private GeneratedOrderRepo generatedOrderRepo;

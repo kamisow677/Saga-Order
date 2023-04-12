@@ -1,4 +1,4 @@
-package com.kamillo.task.scheduler.infrastructure.order;
+package com.kamillo.task.scheduler.order.infra;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -17,4 +17,5 @@ public interface GeneratedOrderRepo extends JpaRepository<PostgresOrder, Long> {
     @Query("SELECT o FROM PostgresOrder o")
     Iterable<PostgresOrder> getByOrderID3();
 
+    Optional<PostgresOrder> findByOrderId(UUID orderId);
 }

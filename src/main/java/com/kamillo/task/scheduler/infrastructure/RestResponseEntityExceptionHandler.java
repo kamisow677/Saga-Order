@@ -1,6 +1,6 @@
 package com.kamillo.task.scheduler.infrastructure;
 
-import com.kamillo.task.scheduler.infrastructure.order.NoSuchOrderException;
+import com.kamillo.task.scheduler.order.infra.NoSuchOrderException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;

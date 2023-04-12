@@ -1,4 +1,4 @@
-package com.kamillo.task.scheduler.domain.seats;
+package com.kamillo.task.scheduler.order.domain;
 
 import com.kamillo.task.scheduler.infrastructure.api.BlockSeatParams;
 
@@ -8,5 +8,7 @@ public interface SeatsRepository {
 
     boolean areFree(BlockSeatParams blockSeatParams);
 
-    boolean freeSeats(UUID orderId);
+    boolean setFree(UUID orderId);
+
+    boolean exists(BlockSeatParams blockSeatParams);
 }

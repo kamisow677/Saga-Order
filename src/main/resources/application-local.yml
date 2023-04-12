@@ -14,26 +14,3 @@ spring:
     driverClassName: org.postgresql.Driver
     username: postgres
     password: postgres
-
-###--kafka
-##  cloud:
-##    stream:
-##      function:
-##        definition: fizzBuzzProducer;fizzBuzzProcessor;fizzBuzzConsumer
-##      bindings:
-##        input:
-##          destination: numbers2
-##        output:
-##          destination: numbers2
-##        fizzBuzzProducer-out-0:
-##          destination: numbers
-##        fizzBuzzProcessor-in-0:
-##          destination: numbers
-##        fizzBuzzProcessor-out-0:
-##          destination: fizz-buzz
-##        fizzBuzzConsumer-in-0:
-##          destination: fizz-buzz
-##      kafka:
-##        binder:
-##          brokers: localhost:9092
-##          auto-create-topics: true

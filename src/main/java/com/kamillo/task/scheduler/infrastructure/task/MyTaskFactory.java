@@ -3,9 +3,9 @@ package com.kamillo.task.scheduler.infrastructure.task;
 
 import com.kamillo.task.scheduler.domain.scheduler.SchedulerServiceFacade;
 import com.kamillo.task.scheduler.domain.scheduler.TaskFactory;
-import com.kamillo.task.scheduler.infrastructure.order.GeneratedOrderRepo;
-import com.kamillo.task.scheduler.infrastructure.order.NoSuchOrderException;
-import com.kamillo.task.scheduler.infrastructure.order.PostgresOrder;
+import com.kamillo.task.scheduler.order.infra.GeneratedOrderRepo;
+import com.kamillo.task.scheduler.order.infra.NoSuchOrderException;
+import com.kamillo.task.scheduler.order.infra.PostgresOrder;
 import jakarta.annotation.PreDestroy;
 import jakarta.transaction.Transactional;
 import org.quartz.TriggerKey;

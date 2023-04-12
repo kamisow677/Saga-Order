@@ -1,12 +1,12 @@
 package com.kamillo.task.scheduler.infrastructure.saga;
 
-import com.kamillo.task.scheduler.domain.order.OrderRepository;
 import com.kamillo.task.scheduler.domain.saga.SagaSeatEnum;
 import com.kamillo.task.scheduler.domain.saga.SagaSeatEvents;
-import com.kamillo.task.scheduler.domain.seats.SeatFacade;
 import com.kamillo.task.scheduler.infrastructure.api.BlockSeatParams;
 import com.kamillo.task.scheduler.infrastructure.task.MyTaskFactory;
 import com.kamillo.task.scheduler.infrastructure.task.TaskType;
+import com.kamillo.task.scheduler.order.domain.OrderDomain;
+import com.kamillo.task.scheduler.order.domain.OrderFacade;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.Message;
@@ -30,8 +30,7 @@ import static com.kamillo.task.scheduler.domain.saga.SagaSeatEvents.BLOCK_EVENT;
 import static com.kamillo.task.scheduler.domain.saga.SagaSeatEvents.PAYMENT_DONE_EVENT;
 import static com.kamillo.task.scheduler.domain.saga.SagaSeatEvents.PAYMENT_REJECTED_EVENT;
 import static com.kamillo.task.scheduler.domain.saga.SagaSeatEvents.START_PAYMENT_EVENT;
-import static com.kamillo.task.scheduler.infrastructure.saga.MessagesFactory.ORDER_ID_HEADER;
-import static com.kamillo.task.scheduler.infrastructure.saga.MessagesFactory.SEATS_PARAMS;
+import static com.kamillo.task.scheduler.infrastructure.saga.MessagesFactory.*;
 
 @Configuration
 @EnableStateMachineFactory
@@ -40,11 +39,11 @@ public class SeatSagaSimpleStateMachineConfiguration
         extends StateMachineConfigurerAdapter<SagaSeatEnum, SagaSeatEvents> {
 
     private final MyTaskFactory myTaskFactory;
-    private final SeatFacade seatFacade;
+    private final OrderFacade orderFacade;
 
-    public SeatSagaSimpleStateMachineConfiguration(MyTaskFactory myTaskFactory, SeatFacade seatFacade) {
+    public SeatSagaSimpleStateMachineConfiguration(MyTaskFactory myTaskFactory, OrderFacade orderFacade) {
         this.myTaskFactory = myTaskFactory;
-        this.seatFacade = seatFacade;
+        this.orderFacade = orderFacade;
     }
 
     @Override
@@ -92,7 +91,8 @@ public class SeatSagaSimpleStateMachineConfiguration
                         context -> {
                             BlockSeatParams blockSeatParams = (BlockSeatParams) context.getMessageHeaders().get(SEATS_PARAMS);
                             UUID orderId = (UUID) context.getMessageHeaders().get(ORDER_ID_HEADER);
-                            seatFacade.blockSeats(blockSeatParams, orderId);
+                            OrderDomain order = (OrderDomain) context.getMessageHeaders().get(ORDER);
+                            orderFacade.issueNewOrderWithTransaction(order, blockSeatParams);
                             log.info("Order: " + orderId + " from state " + SEAT_FREE + " to " + SEAT_BLOCKED);
                         }
                     )
@@ -118,7 +118,7 @@ public class SeatSagaSimpleStateMachineConfiguration
                     .event(PAYMENT_REJECTED_EVENT).action(
                         context -> {
                             UUID orderId = (UUID) context.getMessageHeaders().get(ORDER_ID_HEADER);
-                            seatFacade.freeSeats(orderId);
+                            orderFacade.rejectOrder(orderId);
                             log.info("Order: " + orderId + " from state " + SEAT_PAYMENT_PENDING + " to " + SEAT_FREE);
                         }
                 );
